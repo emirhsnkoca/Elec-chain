@@ -1,0 +1,67 @@
+use anchor_lang::prelude::*;
+
+// Program tanımlaması, "Election" programını belirtiyoruz.
+declare_id!("ELECTION_PROGRAM_ID");
+
+// Program modülü, burada ana fonksiyonları ve yapıları tanımlıyoruz.
+#[program]
+pub mod election {
+    use super::*;
+
+    // Oy kullanma işlemi fonksiyonu
+    pub fn vote(ctx: Context<Vote>, candidate_id: u8) -> Result<()> {
+        // Seçmen adresi ctx.accounts.voter içindeki cüzdan adresidir.
+        let voter = &mut ctx.accounts.voter;
+
+        // Eğer seçmen daha önce oy kullanmışsa, hata döndür.
+        if voter.has_voted {
+            return Err(ErrorCode::AlreadyVoted.into());
+        }
+
+        // Seçmen oy kullanmamışsa, has_voted true yapılır.
+        voter.has_voted = true;
+
+        // Aday bilgisine erişim sağlanır (ctx.accounts.candidate).
+        let candidate = &mut ctx.accounts.candidate;
+
+        // Adayın aldığı oy sayısı bir artırılır.
+        candidate.vote_count += 1;
+
+        // İşlem başarılı olduğu için boş bir Result döndürülür.
+        Ok(())
+    }
+}
+
+// Oy kullanma işlemi için gerekli olan hesaplar burada tanımlanıyor.
+#[derive(Accounts)]
+pub struct Vote<'info> {
+    // Oy kullanan seçmen (account)
+    #[account(mut)]
+    pub voter: Account<'info, Voter>,
+
+    // Oy verilen aday (account)
+    #[account(mut)]
+    pub candidate: Account<'info, Candidate>,
+
+    // Sistem programı (Solana'daki sistem işlemlerini yönetir)
+    pub system_program: Program<'info, System>,
+}
+
+// Seçmen yapısı, her seçmenin cüzdan adresi ve oy kullanıp kullanmadığı bilgisi burada tutuluyor.
+#[account]
+pub struct Voter {
+    pub has_voted: bool, // Seçmenin oy kullanıp kullanmadığı bilgisini tutar.
+}
+
+// Aday yapısı, her adayın aldığı oy sayısı burada tutulur.
+#[account]
+pub struct Candidate {
+    pub vote_count: u64, // Adayın aldığı toplam oy sayısını tutar.
+}
+
+// Hataları tanımlıyoruz. Bir hata kodu, örneğin bir seçmen daha önce oy kullandıysa bu kod döner.
+#[error_code]
+pub enum ErrorCode {
+    #[msg("You have already voted.")]
+    AlreadyVoted,
+}
