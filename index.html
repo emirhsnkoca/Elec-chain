@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Election System</title>
+</head>
+<body>
+    <h1>Blockchain Seçim Sistemi</h1>
+    
+    <!-- Cüzdanı Bağlama Butonu -->
+    <button id="connect-wallet">Cüzdan Bağla</button>
+
+    <!-- Bağlı Cüzdan Adresi -->
+    <p id="wallet-address">Cüzdan adresiniz: Bağlı değil</p>
+
+    <!-- Adayların Listesi ve Oy Verme Butonları -->
+    <div id="candidates">
+        <h3>Adaylar</h3>
+        <!-- Her aday için bir oy verme butonu -->
+        <button onclick="vote(0)">Aday 1'e Oy Ver</button>
+        <button onclick="vote(1)">Aday 2'ye Oy Ver</button>
+        <!-- İhtiyaca göre aday sayısı kadar buton eklenebilir -->
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
